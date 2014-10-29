@@ -3,25 +3,22 @@
 
 class Cell
 {
-    const static int m_iSubCellsNbr = 8;
-    float m_afCoordsMin[3];
-    float m_afCoordsMax[3];
-    Cell* m_aChildren[m_iSubCellsNbr];
+    protected:
+        const static int m_iSubCellsNbr = 8;
+        float m_afCoordsMin[3];
+        float m_afCoordsMax[3];
+        std::vector<Cell*> m_vChildren;
 
     public:
         Cell();
-        int getChildrenNbr();
-        Cell* getChildAt(int);
+        std::vector<Cell*> getChildren();
         float* getMin();
         void divide();
-        ~Cell();
-
+        void clear();
 };
 
 Cell::Cell()
 {
-    for (int i=0;i<m_iSubCellsNbr;i++)
-        m_aChildren[i] = NULL;
     m_afCoordsMin[0] = 0;
     m_afCoordsMin[1] = 0;
     m_afCoordsMin[2] = 0;
@@ -31,14 +28,9 @@ Cell::Cell()
     m_afCoordsMax[2] = 1;
 }
 
-int Cell::getChildrenNbr()
+std::vector<Cell*> Cell::getChildren()
 {
-    return m_iSubCellsNbr;
-}
-
-Cell* Cell::getChildAt(int index)
-{
-    return m_aChildren[index];
+    return m_vChildren;
 }
 
 float* Cell::getMin()
@@ -48,18 +40,27 @@ float* Cell::getMin()
 
 void Cell::divide()
 {
-    for (int i = 0; i < m_iSubCellsNbr; i++)
+    if (m_vChildren.empty())
     {
-        Cell newCell;
-        Cell* pNewCell = new Cell(newCell);
-        m_aChildren[i] = pNewCell;
+        for (int i = 0; i < m_iSubCellsNbr; ++i)
+        {
+            Cell* newCell = new Cell;
+            m_vChildren.push_back(newCell);
+        }
+    }
+    else
+    {
+        for (int i=0;i<m_iSubCellsNbr;i++)
+            m_vChildren.at(i)->divide();
     }
 }
-
-
-Cell::~Cell()
+void Cell::clear()
 {
-    for (int i=0;i<m_iSubCellsNbr;i++)
-        delete(m_aChildren[i]);
-    delete(m_aChildren);
+    while(m_vChildren.size())
+    {
+        Cell *child = m_vChildren.back();
+        m_vChildren.back();
+        child->clear();
+        delete child;
+    }
 }

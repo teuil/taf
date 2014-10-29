@@ -1,16 +1,11 @@
-#include "cell.h"
+#include "octree.h"
 #include <iostream>
 #include <stdio.h>
 using namespace std;
 int main()
 {
-    Cell myCell;
-    //float* afMinCoords;
-    myCell.divide();
-    for (int i = 0; i < myCell.getChildrenNbr(); i++)
-    {
-        printf("%f\n",myCell.getChildAt(i)->getMin());
-    	cout<<"----------------------------------"<<endl;
-    }
+    Octree myOctree1;
+    Octree myOctree2 = myOctree.fragment();
+    myOctree3 = myOctree2.fragment();
     return 0;
 }
