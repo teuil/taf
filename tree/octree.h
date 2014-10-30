@@ -1,22 +1,22 @@
 #include "cell.h"
 #include <vector>
+#include <stdio.h>
 
 class Octree: public Cell
 {
+	private:
+		Octree *m_nextOctree;
 	public:
 		Octree();
 		Octree(std::vector<Cell*>);
-		void divide();
-		Octree fragment();
+		Octree* fragment();
+		void clear();
 };
 
 Octree::Octree()
 {
-    for (int i = 0; i < m_iSubCellsNbr; ++i)
-    {
-        Cell* newCell = new Cell;
-        m_vChildren.push_back(newCell);
-    }
+	m_nextOctree = NULL;
+	_divide();
 }
 
 Octree::Octree(std::vector<Cell*> cells)
@@ -24,18 +24,26 @@ Octree::Octree(std::vector<Cell*> cells)
 	for(std::vector<Cell*>::iterator it = cells.begin(); it != cells.end(); ++it)
 	{
 		std::vector<Cell*> *children;
-		children = *(*it)->getChildren();
+		children = (*it)->getChildren();
     	m_vChildren.insert(m_vChildren.end(), children->begin(), children->end());
 	}
+	m_iCellNbr = m_vChildren.size();
 }
 
-void Octree::divide(){}
-
-Octree Octree::fragment()
+Octree* Octree::fragment()
 {
-	for(std::vector<Cell*>::iterator it = cells.begin(); it != cells.end(); ++it)
+	for(std::vector<Cell*>::iterator it = m_vChildren.begin(); it != m_vChildren.end(); ++it)
 	{
-		*it->divide();
+		(*it)->fragment();
 	}
-	return Octree(m_vChildren);
+	m_nextOctree = new Octree(m_vChildren);
+	return m_nextOctree;
+}
+
+void Octree::clear()
+{
+    if(m_nextOctree!=NULL)
+        m_nextOctree->clear();
+	_clear();
+	printf("all clear! %d\n", m_iCellNbr);
 }
